@@ -1,0 +1,63 @@
+{
+    "Outputs": {
+        "ClusterName": {
+            "Value": "test-k8s"
+        },
+        "RoleArn": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "EksServiceRole",
+                    "Arn"
+                ]
+            }
+        }
+    },
+    "Resources": {
+        "EksCluster": {
+            "Properties": {
+                "Name": "test-k8s",
+                "ResourcesVpcConfig": {
+                    "SecurityGroupIds": [
+                        "sg-abc1234"
+                    ],
+                    "SubnetIds": [
+                        "net-123456",
+                        "net-123457"
+                    ]
+                },
+                "RoleArn": {
+                    "Fn::GetAtt": [
+                        "EksServiceRole",
+                        "Arn"
+                    ]
+                }
+            },
+            "Type": "AWS::EKS::Cluster"
+        },
+        "EksServiceRole": {
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ],
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "eks.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy",
+                    "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
+                ],
+                "Path": "/"
+            },
+            "Type": "AWS::IAM::Role"
+        }
+    }
+}
