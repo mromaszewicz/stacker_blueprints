@@ -77,7 +77,7 @@ class Cluster(Blueprint):
     def create_iam_role(self):
         eks_service_role_id = "EksServiceRole"
         t = self.template
-        t.add_resource(
+        role = t.add_resource(
             Role(
                 eks_service_role_id,
                 AssumeRolePolicyDocument=Policy(
@@ -97,7 +97,7 @@ class Cluster(Blueprint):
                 ]
             )
         )
-        return GetAtt(eks_service_role_id, "Arn")
+        return role.GetAtt("Arn")
 
     def get_iam_role(self):
         role_arn = self.get_variables()["ExistingRoleArn"]
@@ -204,7 +204,7 @@ max_pods_per_instance = {
 
 def create_max_pods_per_node_mapping(t):
     mapping = {}
-    for instance, max_pods in max_pods_per_instance.iteritems():
+    for instance, max_pods in max_pods_per_instance.items():
         mapping[instance] = {"MaxPods": max_pods}
     t.add_mapping("MaxPodsPerNode", mapping)
 
@@ -263,7 +263,7 @@ class Workers(Blueprint):
             "type": str,
             "description": "The name of the cluster for workers to join."
         },
-        "WorkerSecurityGroupId": {
+        "SecurityGroupId": {
             "type": str,
             "description": "The security group ID which will contain worker "
                            "nodes."
@@ -286,7 +286,7 @@ class Workers(Blueprint):
                            "AutoScalingGroup. Defaults to minimum.",
             "default": -1,
         },
-        "WorkerSubnets": {
+        "Subnets": {
             "type": str,
             "description": "A list of subnet ID's where workers will be "
                            "launched."
@@ -376,8 +376,8 @@ class Workers(Blueprint):
                 ImageId=variables["ImageId"],
                 InstanceType=variables["InstanceType"],
                 KeyName=variables["KeyName"],
-                SecurityGroups=[variables["WorkerSecurityGroupId"]],
-                UserData=Base64(Join("", user_data)),
+                SecurityGroups=[variables["SecurityGroupId"]],
+                UserData=user_data,
                 BlockDeviceMappings=[
                     BlockDeviceMapping(
                         DeviceName=variables["RootVolumeDevice"],
@@ -397,7 +397,7 @@ class Workers(Blueprint):
             desired_instances = min_instances
 
         # Create the AutoScalingGroup which will manage our instances. It's
-        # easy to change the worker count be tweaking the limits in here once
+        # easy to change the worker count by tweaking the limits in here once
         # everything is up and running.
         t.add_resource(
             AutoScalingGroup(
@@ -406,7 +406,7 @@ class Workers(Blueprint):
                 MaxSize=max_instances,
                 DesiredCapacity=desired_instances,
                 LaunchConfigurationName=launch_config.ref(),
-                VPCZoneIdentifier=variables["WorkerSubnets"].split(","),
+                VPCZoneIdentifier=variables["Subnets"].split(","),
                 Tags=[
                     Tag("Name", "%s-eks-worker" % cluster_name, True),
                     Tag("kubernetes.io/cluster/%s" % cluster_name,
