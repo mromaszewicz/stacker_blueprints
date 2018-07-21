@@ -1,48 +1,68 @@
 {
     "Outputs": {
+        "ClusterArn": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "Cluster", 
+                    "Arn"
+                ]
+            }
+        }, 
+        "ClusterEndpoint": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "Cluster", 
+                    "Endpoint"
+                ]
+            }
+        }, 
         "ClusterName": {
-            "Value": "test-k8s"
-        },
+            "Value": {
+                "Ref": "Cluster"
+            }
+        }, 
         "RoleArn": {
             "Value": {
                 "Fn::GetAtt": [
-                    "EksServiceRole",
+                    "Role", 
                     "Arn"
                 ]
             }
         }
-    },
+    }, 
     "Resources": {
-        "EksCluster": {
+        "Cluster": {
             "Properties": {
-                "Name": "test-k8s",
                 "ResourcesVpcConfig": {
                     "SecurityGroupIds": [
                         "sg-abc1234"
-                    ],
+                    ], 
                     "SubnetIds": [
-                        "net-123456",
+                        "net-123456", 
                         "net-123457"
                     ]
-                },
+                }, 
                 "RoleArn": {
                     "Fn::GetAtt": [
-                        "EksServiceRole",
+                        "Role", 
                         "Arn"
                     ]
+                }, 
+                "Version": {
+                    "Ref": "AWS::NoValue"
                 }
-            },
+            }, 
             "Type": "AWS::EKS::Cluster"
-        },
-        "EksServiceRole": {
+        }, 
+        "Role": {
             "Properties": {
                 "AssumeRolePolicyDocument": {
                     "Statement": [
                         {
                             "Action": [
                                 "sts:AssumeRole"
-                            ],
-                            "Effect": "Allow",
+                            ], 
+                            "Effect": "Allow", 
                             "Principal": {
                                 "Service": [
                                     "eks.amazonaws.com"
@@ -50,13 +70,13 @@
                             }
                         }
                     ]
-                },
+                }, 
                 "ManagedPolicyArns": [
-                    "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy",
+                    "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy", 
                     "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
-                ],
+                ], 
                 "Path": "/"
-            },
+            }, 
             "Type": "AWS::IAM::Role"
         }
     }
