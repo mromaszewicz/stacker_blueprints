@@ -27,6 +27,44 @@ class TestEC2Blueprint(BlueprintTestCase):
         blueprint.create_template()
         self.assertRenderedBlueprint(blueprint)
 
+    def test_ec2_instances_with_public_ip(self):
+        blueprint = Instances("ec2_instances_with_public_ip", self.ctx)
+        my_instance = self.common_variables[0]._value["MyInstance"]
+        my_instance["NetworkInterfaces"] = [
+            {
+                "DeviceIndex": 1,
+                "NetworkInterfaceId": "net-dafdafadf1",
+            },
+            {
+                "DeviceIndex": 0,
+                "NetworkInterfaceId": "net-dafdafadf0",
+                "AssociatePublicIpAddress": True,
+            }
+        ]
+        blueprint.resolve_variables(self.common_variables)
+        blueprint.create_template()
+        self.assertRenderedBlueprint(blueprint)
+
+    def test_ec2_instances_with_interfaces_no_public_ip(self):
+        blueprint = Instances(
+            "ec2_instances_with_interfaces_no_public_ip",
+            self.ctx
+        )
+        my_instance = self.common_variables[0]._value["MyInstance"]
+        my_instance["NetworkInterfaces"] = [
+            {
+                "DeviceIndex": 1,
+                "NetworkInterfaceId": "net-dafdafadf1",
+            },
+            {
+                "DeviceIndex": 0,
+                "NetworkInterfaceId": "net-dafdafadf0",
+            }
+        ]
+        blueprint.resolve_variables(self.common_variables)
+        blueprint.create_template()
+        self.assertRenderedBlueprint(blueprint)
+
 
 class TestSecurityGroupsBlueprint(BlueprintTestCase):
     def setUp(self):

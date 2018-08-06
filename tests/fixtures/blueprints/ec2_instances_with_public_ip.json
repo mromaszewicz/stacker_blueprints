@@ -28,12 +28,39 @@
                     "PrivateIp"
                 ]
             }
+        }, 
+        "MyInstancePublicDnsName": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "MyInstance", 
+                    "PublicDnsName"
+                ]
+            }
+        }, 
+        "MyInstancePublicIp": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "MyInstance", 
+                    "PublicIp"
+                ]
+            }
         }
     }, 
     "Resources": {
         "MyInstance": {
             "Properties": {
-                "ImageId": "ami-abc12345"
+                "ImageId": "ami-abc12345", 
+                "NetworkInterfaces": [
+                    {
+                        "DeviceIndex": 1, 
+                        "NetworkInterfaceId": "net-dafdafadf1"
+                    }, 
+                    {
+                        "AssociatePublicIpAddress": "true", 
+                        "DeviceIndex": 0, 
+                        "NetworkInterfaceId": "net-dafdafadf0"
+                    }
+                ]
             }, 
             "Type": "AWS::EC2::Instance"
         }

@@ -411,7 +411,7 @@ class SimpleECSService(Blueprint):
         self.policy = t.add_resource(
             iam.ManagedPolicy(
                 "ManagedPolicy",
-                PolicyDocument=self.generate_policy(),
+                PolicyDocument=policy_doc,
                 Roles=[self.role.Ref()],
             )
         )

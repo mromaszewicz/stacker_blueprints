@@ -17,6 +17,17 @@ class Instances(Blueprint):
         },
     }
 
+    def has_public_ip(self, instance):
+        network_interfaces = instance.properties.get("NetworkInterfaces", [])
+        has_public_ip = False
+        for interface in network_interfaces:
+            if int(interface.properties["DeviceIndex"]) == 0:
+                has_public_ip = interface.properties.get(
+                    "AssociatePublicIpAddress"
+                ) == "true"
+                break
+        return has_public_ip
+
     def create_template(self):
         t = self.template
         variables = self.get_variables()
@@ -42,24 +53,25 @@ class Instances(Blueprint):
 
             t.add_output(
                 Output(
-                    title + "PublicDnsName",
-                    Value=instance.GetAtt("PublicDnsName")
-                )
-            )
-
-            t.add_output(
-                Output(
                     title + "PrivateIp",
                     Value=instance.GetAtt("PrivateIp")
                 )
             )
 
-            t.add_output(
-                Output(
-                    title + "PublicIp",
-                    Value=instance.GetAtt("PublicIp")
+            if self.has_public_ip(instance):
+                t.add_output(
+                    Output(
+                        title + "PublicIp",
+                        Value=instance.GetAtt("PublicIp")
+                    )
                 )
-            )
+
+                t.add_output(
+                    Output(
+                        title + "PublicDnsName",
+                        Value=instance.GetAtt("PublicDnsName")
+                    )
+                )
 
 
 class SecurityGroups(Blueprint):

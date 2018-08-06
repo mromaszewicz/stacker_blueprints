@@ -33,7 +33,17 @@
     "Resources": {
         "MyInstance": {
             "Properties": {
-                "ImageId": "ami-abc12345"
+                "ImageId": "ami-abc12345", 
+                "NetworkInterfaces": [
+                    {
+                        "DeviceIndex": 1, 
+                        "NetworkInterfaceId": "net-dafdafadf1"
+                    }, 
+                    {
+                        "DeviceIndex": 0, 
+                        "NetworkInterfaceId": "net-dafdafadf0"
+                    }
+                ]
             }, 
             "Type": "AWS::EC2::Instance"
         }

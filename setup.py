@@ -7,7 +7,7 @@ install_requires = [
     "python-dateutil<3.0.0",
     "stacker>=1.0.1",
     "troposphere>=2.2.2",
-    "awacs>=0.6.0",
+    "awacs>=0.8.0",
 ]
 
 tests_require = [
